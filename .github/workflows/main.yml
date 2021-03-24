@@ -1,0 +1,59 @@
+name: OctoBot-App-CI
+on: push
+
+jobs:
+  builds:
+    name: Android - build
+    runs-on: ubuntu-latest
+    env:
+      PYTHONUNBUFFERED: 1
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.8.x'
+        architecture: x64
+
+    - name: Set numeric version
+      id: settings
+      run: echo "::set-output name=numeric_version::$(date +%Y%m%d%H%M%S)"
+
+    - name: Clone OctoBot
+      env:
+        OCTOBOT_GH_REPO: https://github.com/Drakkar-Software/OctoBot.git
+        OCTOBOT_DEFAULT_BRANCH: dev
+        OCTOBOT_REPOSITORY_DIR: OctoBot
+      run: |
+        # Prepare env
+        pip3 install -U pip setuptools wheel
+        pip3 install -r requirements.txt
+
+        # Clone OctoBot
+        git clone -q $OCTOBOT_GH_REPO -b $OCTOBOT_DEFAULT_BRANCH $OCTOBOT_REPOSITORY_DIR
+        cd $OCTOBOT_REPOSITORY_DIR
+
+        # Create OctoBot App entrypoint
+        mv start.py main.py
+
+        # Move OctoBot App files
+        cp -r ../assets ./assets
+        cp ../buildozer.spec buildozer.spec
+
+    - name: Build with Buildozer
+      uses: ArtemSBulgakov/buildozer-action@v1
+      id: buildozer
+      with:
+        command: buildozer android debug
+        repository_root: OctoBot
+        buildozer_version: stable
+      env:
+        BUILDOZER_APP_ANDROID_NUMERIC_VERSION: ${{ steps.settings.outputs.numeric_version }}
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: octobot.apk
+        path: ${{ steps.buildozer.outputs.filename }}
