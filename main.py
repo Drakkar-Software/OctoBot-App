@@ -13,9 +13,24 @@
 #
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
-import sys
+from kivy.app import App
+from kivy.lang import Builder
 
-from octobot.cli import main
+kv = '''
+Button:
+    text: 'Start OctoBot!'
+    on_press: app.start()
+'''
+
+
+class ServiceApp(App):
+    def build(self):
+        return Builder.load_string(kv)
+
+    def start(self):
+        from octobot.cli import main
+        main()
+
 
 if __name__ == '__main__':
-    main(sys.argv[1:])
+    ServiceApp().run()
