@@ -67,3 +67,8 @@ linux/
 django/
 
 *.dist-info
+
+# OctoBot
+logs
+user
+tentacles

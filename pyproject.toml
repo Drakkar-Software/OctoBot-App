@@ -7,20 +7,20 @@ license = "GNU General Public License v3 (GPLv3)"
 author = 'Drakkar-Software'
 author_email = "drakkar-software@octobot.online"
 
-[tool.briefcase.app.octobot]
+[tool.briefcase.app.octobot_app]
 formal_name = "OctoBot"
 description = "Cryptocurrency trading bot"
-icon = "src/octobot/resources/octobot"
-sources = ['src/octobot']
-requires = []
+icon = "src/octobot_app/resources/octobot"
+sources = ['src/octobot_app']
+requires = ['OctoBot==0.4.0b9']
 
 
-[tool.briefcase.app.octobot.macOS]
+[tool.briefcase.app.octobot_app.macOS]
 requires = [
     'toga-cocoa>=0.3.0.dev20',
 ]
 
-[tool.briefcase.app.octobot.linux]
+[tool.briefcase.app.octobot_app.linux]
 requires = [
     'toga-gtk>=0.3.0.dev20',
 ]
@@ -32,18 +32,18 @@ system_requires = [
     'gir1.2-webkit-3.0',
 ]
 
-[tool.briefcase.app.octobot.windows]
+[tool.briefcase.app.octobot_app.windows]
 requires = [
     'toga-winforms>=0.3.0.dev20',
 ]
 
 # Mobile deployments
-[tool.briefcase.app.octobot.iOS]
+[tool.briefcase.app.octobot_app.iOS]
 requires = [
     'toga-iOS>=0.3.0.dev20',
 ]
 
-[tool.briefcase.app.octobot.android]
+[tool.briefcase.app.octobot_app.android]
 requires = [
     'toga-android>=0.3.0.dev20',
 ]
