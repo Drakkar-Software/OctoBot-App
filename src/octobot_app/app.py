@@ -20,23 +20,12 @@ class OctoBot(toga.App):
 
         self.webview = toga.WebView(style=Pack(flex=1))
         self.url_input = toga.TextInput(
-            initial='https://beeware.org/',
+            initial='http://localhost:5001/',
             style=Pack(flex=1)
         )
 
         box = toga.Box(
             children=[
-                toga.Box(
-                    children=[
-                        self.url_input,
-                        toga.Button('Go', on_press=self.load_page, style=Pack(width=50, padding_left=5)),
-                    ],
-                    style=Pack(
-                        direction=ROW,
-                        alignment=CENTER,
-                        padding=5,
-                    )
-                ),
                 self.webview,
             ],
             style=Pack(
