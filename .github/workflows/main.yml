@@ -2,11 +2,123 @@ name: OctoBot-App-CI
 on: push
 
 jobs:
-  builds:
-    name: Android - build
-    runs-on: ubuntu-latest
-    env:
-      PYTHONUNBUFFERED: 1
+  build-desktop:
+    name: Build Desktop - ${{ matrix.os }} - ${{ matrix.arch }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ macos-latest, windows-latest, ubuntu-latest ]
+        arch: [ x64 ]
 
     steps:
     - uses: actions/checkout@v2
+
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.8.x'
+        architecture: ${{ matrix.arch }}
+
+    - name: Install Linux packages
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y --no-install-recommends git libgirepository1.0-dev libcairo2-dev libpango1.0-dev libwebkit2gtk-4.0-37 gir1.2-webkit2-4.0
+
+    - name: Install Python dependencies
+      run: pip install wheel && pip install --prefer-binary -r requirements.txt
+
+    - name: Clone OctoBot dev
+      run: git clone https://github.com/Drakkar-Software/OctoBot -b dev
+
+    - name: Create application scaffold
+      run: briefcase create
+
+    - name: Build application
+      run: briefcase build
+
+    - name: Build installer
+      if: matrix.os != 'macos-latest'
+      run: briefcase package
+
+    - name: Build installer
+      if: matrix.os == 'macos-latest'
+      run: briefcase package --no-sign
+
+    - uses: actions/upload-artifact@v2
+      if: matrix.os == 'ubuntu-latest'
+      with:
+        name: OctoBot-0.0.1-x86_64.AppImage
+        path: linux/OctoBot-0.0.1-x86_64.AppImage
+        if-no-files-found: error
+
+    - uses: actions/upload-artifact@v2
+      if: matrix.os == 'macos-latest'
+      with:
+        name: OctoBot-0.0.1.dmg
+        path: macOS/OctoBot-0.0.1.dmg
+        if-no-files-found: error
+
+    - uses: actions/upload-artifact@v2
+      if: matrix.os == 'windows-latest'
+      with:
+        name: OctoBot-0.0.1.msi
+        path: windows/OctoBot-0.0.1.msi
+        if-no-files-found: error
+
+#  build-android:
+#    name: Build Android
+#    runs-on: ubuntu-latest
+#
+#    steps:
+#    - uses: actions/checkout@v2
+#
+#    - name: Set up Python 3.8
+#      uses: actions/setup-python@v2
+#      with:
+#        python-version: '3.8.x'
+#        architecture: 'x64'
+#
+#    - name: Install Linux packages
+#      run: |
+#        sudo apt-get update
+#        sudo apt-get install -y --no-install-recommends git libgirepository1.0-dev libcairo2-dev libpango1.0-dev libwebkit2gtk-4.0-37 gir1.2-webkit2-4.0
+#
+#    - name: Install Python dependencies
+#      run: |
+#        pip install wheel && pip install --prefer-binary -r requirements.txt
+#
+#    - name: Clone OctoBot dev
+#      run: |
+#        git clone https://github.com/Drakkar-Software/OctoBot -b dev
+#
+#    - name: Build Android
+#      run: |
+#        briefcase create android
+#        briefcase build android
+
+#  build-ios:
+#    name: Build IOS
+#    runs-on: macos-latest
+#
+#    steps:
+#    - uses: actions/checkout@v2
+#
+#    - name: Set up Python 3.8
+#      uses: actions/setup-python@v2
+#      with:
+#        python-version: '3.8.x'
+#        architecture: 'x64'
+#
+#    - name: Install Python dependencies
+#      run: |
+#        pip install wheel && pip install --prefer-binary -r requirements.txt
+#
+#    - name: Clone OctoBot dev
+#      run: |
+#        git clone https://github.com/Drakkar-Software/OctoBot -b dev
+#
+#    - name: Build Android
+#      run: |
+#        briefcase create iOS
+#        briefcase build iOS -d "iPhone 11::13.3"
