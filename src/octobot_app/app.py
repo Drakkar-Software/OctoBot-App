@@ -1,24 +1,15 @@
-import threading
-
 import toga
-import os
-import octobot.cli as cli
-import octobot_services.constants as services_constants
 from toga.style import Pack
-from toga.style.pack import COLUMN, ROW, CENTER
+from toga.style.pack import COLUMN
 
 
 class OctoBot(toga.App):
-
     def startup(self):
         self.main_window = toga.MainWindow(title=self.name)
 
-        os.putenv(services_constants.ENV_AUTO_OPEN_IN_WEB_BROWSER, "false")
-
-        x = threading.Thread(target=cli.start_background_octobot_with_args, args=())
-        x.start()
-
-        self.webview = toga.WebView(style=Pack(flex=1))
+        self.webview = toga.WebView(
+            style=Pack(flex=1)
+        )
         self.url_input = toga.TextInput(
             initial='http://localhost:5001/',
             style=Pack(flex=1)
