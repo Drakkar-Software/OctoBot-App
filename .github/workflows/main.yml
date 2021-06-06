@@ -28,9 +28,6 @@ jobs:
     - name: Install Python dependencies
       run: pip install wheel && pip install --prefer-binary -r requirements.txt
 
-    - name: Clone OctoBot dev
-      run: git clone https://github.com/Drakkar-Software/OctoBot -b dev
-
     - name: Create application scaffold
       run: briefcase create
 
@@ -66,36 +63,31 @@ jobs:
         path: windows/OctoBot-0.0.1.msi
         if-no-files-found: error
 
-#  build-android:
-#    name: Build Android
-#    runs-on: ubuntu-latest
-#
-#    steps:
-#    - uses: actions/checkout@v2
-#
-#    - name: Set up Python 3.8
-#      uses: actions/setup-python@v2
-#      with:
-#        python-version: '3.8.x'
-#        architecture: 'x64'
-#
-#    - name: Install Linux packages
-#      run: |
-#        sudo apt-get update
-#        sudo apt-get install -y --no-install-recommends git libgirepository1.0-dev libcairo2-dev libpango1.0-dev libwebkit2gtk-4.0-37 gir1.2-webkit2-4.0
-#
-#    - name: Install Python dependencies
-#      run: |
-#        pip install wheel && pip install --prefer-binary -r requirements.txt
-#
-#    - name: Clone OctoBot dev
-#      run: |
-#        git clone https://github.com/Drakkar-Software/OctoBot -b dev
-#
-#    - name: Build Android
-#      run: |
-#        briefcase create android
-#        briefcase build android
+  build-android:
+    name: Build Android
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.8.x'
+        architecture: 'x64'
+
+    - name: Install Linux packages
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y --no-install-recommends git libgirepository1.0-dev libcairo2-dev libpango1.0-dev libwebkit2gtk-4.0-37 gir1.2-webkit2-4.0
+
+    - name: Install Python dependencies
+      run: pip install wheel && pip install --prefer-binary -r requirements.txt
+
+    - name: Build Android
+      run: |
+        briefcase create android
+        briefcase build android
 
 #  build-ios:
 #    name: Build IOS
@@ -113,10 +105,6 @@ jobs:
 #    - name: Install Python dependencies
 #      run: |
 #        pip install wheel && pip install --prefer-binary -r requirements.txt
-#
-#    - name: Clone OctoBot dev
-#      run: |
-#        git clone https://github.com/Drakkar-Software/OctoBot -b dev
 #
 #    - name: Build Android
 #      run: |
