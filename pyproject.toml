@@ -12,16 +12,16 @@ formal_name = "OctoBot"
 description = "Cryptocurrency trading bot"
 icon = "src/octobot_app/resources/octobot"
 sources = ['src/octobot_app']
-requires = ['OctoBot==0.4.0b9']
+requires = []
 
 [tool.briefcase.app.octobot_app.macOS]
 requires = [
-    'toga-cocoa>=0.3.0.dev20',
+    'toga-cocoa>=0.3.0.dev28',
 ]
 
 [tool.briefcase.app.octobot_app.linux]
 requires = [
-    'toga-gtk>=0.3.0.dev20',
+    'toga-gtk>=0.3.0.dev28',
 ]
 system_requires = [
     'libgirepository1.0-dev',
@@ -33,16 +33,16 @@ system_requires = [
 
 [tool.briefcase.app.octobot_app.windows]
 requires = [
-    'toga-winforms>=0.3.0.dev20',
+    'toga-winforms>=0.3.0.dev28',
 ]
 
 # Mobile deployments
 [tool.briefcase.app.octobot_app.iOS]
 requires = [
-    'toga-iOS>=0.3.0.dev20',
+    'toga-iOS>=0.3.0.dev28',
 ]
 
 [tool.briefcase.app.octobot_app.android]
 requires = [
-    'toga-android>=0.3.0.dev20',
+    'toga-android>=0.3.0.dev28',
 ]
