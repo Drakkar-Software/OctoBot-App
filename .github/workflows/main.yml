@@ -70,24 +70,39 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: Set up Python 3.8
-      uses: actions/setup-python@v2
+    - uses: uraimo/run-on-arch-action@v2.0.5
       with:
-        python-version: '3.8.x'
-        architecture: 'x64'
+        arch: aarch64
+        distro: ubuntu20.04
 
-    - name: Install Linux packages
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y --no-install-recommends git libgirepository1.0-dev libcairo2-dev libpango1.0-dev libwebkit2gtk-4.0-37 gir1.2-webkit2-4.0
+        # Create an artifacts directory
+        setup: mkdir -p "${PWD}/artifacts"
 
-    - name: Install Python dependencies
-      run: pip install wheel && pip install --prefer-binary -r requirements.txt
+        # Mount the artifacts directory as /artifacts in the container
+        dockerRunArgs: --volume "${PWD}/artifacts:/artifacts"
 
-    - name: Build Android
-      run: |
-        briefcase create android
-        briefcase build android
+        # The shell to run commands with in the container
+        shell: /bin/sh
+
+        # Install some dependencies in the container. This speeds up builds if
+        # you are also using githubToken. Any dependencies installed here will
+        # be part of the container image that gets cached, so subsequent
+        # builds don't have to re-install them. The image layer is cached
+        # publicly in your project's package repository, so it is vital that
+        # no secrets are present in the container state or logs.
+        install: |
+          apt-get update
+          apt-get install -y --no-install-recommends python3.8 python3.8-dev python3-pip git libgirepository1.0-dev libcairo2-dev libpango1.0-dev libwebkit2gtk-4.0-37 gir1.2-webkit2-4.0
+          pip install wheel
+
+        # Not required, but speeds up builds by storing container images in
+        # a GitHub package registry.
+        githubToken: ${{ github.token }}
+
+        run: |
+          pip install --prefer-binary -r requirements.txt
+          briefcase create android
+          briefcase build android
 
 #  build-ios:
 #    name: Build IOS
