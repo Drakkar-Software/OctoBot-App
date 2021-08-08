@@ -12,7 +12,7 @@ formal_name = "OctoBot"
 description = "Cryptocurrency trading bot"
 icon = "src/octobot_app/resources/octobot"
 sources = ['src/octobot_app']
-requires = []
+requires = ['OctoBot==0.4.0b12']
 
 [tool.briefcase.app.octobot_app.macOS]
 requires = [
