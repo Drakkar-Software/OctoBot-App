@@ -2,66 +2,66 @@ name: OctoBot-App-CI
 on: push
 
 jobs:
-  build-desktop:
-    name: Build Desktop - ${{ matrix.os }} - ${{ matrix.arch }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ macos-latest, windows-latest, ubuntu-latest ]
-        arch: [ x64 ]
-
-    steps:
-    - uses: actions/checkout@v2
-
-    - name: Set up Python 3.8
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.8.x'
-        architecture: ${{ matrix.arch }}
-
-    - name: Install Linux packages
-      if: matrix.os == 'ubuntu-latest'
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y --no-install-recommends git libgirepository1.0-dev libcairo2-dev libpango1.0-dev libwebkit2gtk-4.0-37 gir1.2-webkit2-4.0
-
-    - name: Install Python dependencies
-      run: pip install wheel && pip install --prefer-binary -r requirements.txt
-
-    - name: Create application scaffold
-      run: briefcase create
-
-    - name: Build application
-      run: briefcase build
-
-    - name: Build installer
-      if: matrix.os != 'macos-latest'
-      run: briefcase package
-
-    - name: Build installer
-      if: matrix.os == 'macos-latest'
-      run: briefcase package --no-sign
-
-    - uses: actions/upload-artifact@v2
-      if: matrix.os == 'ubuntu-latest'
-      with:
-        name: OctoBot-0.0.1-x86_64.AppImage
-        path: linux/OctoBot-0.0.1-x86_64.AppImage
-        if-no-files-found: error
-
-    - uses: actions/upload-artifact@v2
-      if: matrix.os == 'macos-latest'
-      with:
-        name: OctoBot-0.0.1.dmg
-        path: macOS/OctoBot-0.0.1.dmg
-        if-no-files-found: error
-
-    - uses: actions/upload-artifact@v2
-      if: matrix.os == 'windows-latest'
-      with:
-        name: OctoBot-0.0.1.msi
-        path: windows/OctoBot-0.0.1.msi
-        if-no-files-found: error
+#  build-desktop:
+#    name: Build Desktop - ${{ matrix.os }} - ${{ matrix.arch }}
+#    runs-on: ${{ matrix.os }}
+#    strategy:
+#      matrix:
+#        os: [ macos-latest, windows-latest, ubuntu-latest ]
+#        arch: [ x64 ]
+#
+#    steps:
+#    - uses: actions/checkout@v2
+#
+#    - name: Set up Python 3.8
+#      uses: actions/setup-python@v2
+#      with:
+#        python-version: '3.8.x'
+#        architecture: ${{ matrix.arch }}
+#
+#    - name: Install Linux packages
+#      if: matrix.os == 'ubuntu-latest'
+#      run: |
+#        sudo apt-get update
+#        sudo apt-get install -y --no-install-recommends git libgirepository1.0-dev libcairo2-dev libpango1.0-dev libwebkit2gtk-4.0-37 gir1.2-webkit2-4.0
+#
+#    - name: Install Python dependencies
+#      run: pip install wheel && pip install --prefer-binary -r requirements.txt
+#
+#    - name: Create application scaffold
+#      run: briefcase create
+#
+#    - name: Build application
+#      run: briefcase build
+#
+#    - name: Build installer
+#      if: matrix.os != 'macos-latest'
+#      run: briefcase package
+#
+#    - name: Build installer
+#      if: matrix.os == 'macos-latest'
+#      run: briefcase package --no-sign
+#
+#    - uses: actions/upload-artifact@v2
+#      if: matrix.os == 'ubuntu-latest'
+#      with:
+#        name: OctoBot-0.0.1-x86_64.AppImage
+#        path: linux/OctoBot-0.0.1-x86_64.AppImage
+#        if-no-files-found: error
+#
+#    - uses: actions/upload-artifact@v2
+#      if: matrix.os == 'macos-latest'
+#      with:
+#        name: OctoBot-0.0.1.dmg
+#        path: macOS/OctoBot-0.0.1.dmg
+#        if-no-files-found: error
+#
+#    - uses: actions/upload-artifact@v2
+#      if: matrix.os == 'windows-latest'
+#      with:
+#        name: OctoBot-0.0.1.msi
+#        path: windows/OctoBot-0.0.1.msi
+#        if-no-files-found: error
 
   build-android:
     name: Build Android
@@ -74,6 +74,12 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 1.8
+
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.8.x'
+        architecture: 'x64'
 
     - name: Setup Android SDK
       uses: android-actions/setup-android@v2
@@ -103,8 +109,14 @@ jobs:
         # no secrets are present in the container state or logs.
         install: |
           apt-get update
-          apt-get install -y --no-install-recommends python3.8 python3.8-dev python3-pip git libgirepository1.0-dev libcairo2-dev libpango1.0-dev libwebkit2gtk-4.0-37 gir1.2-webkit2-4.0
-          pip install wheel
+          apt-get install -y --no-install-recommends software-properties-common wget gnupg2 python3.8 python3.8-dev python3-pip python3-cryptography git libssl-dev cargo libffi-dev libgirepository1.0-dev libcairo2-dev libpango1.0-dev libwebkit2gtk-4.0-37 gir1.2-webkit2-4.0
+          wget -qO - https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public | apt-key add -
+          add-apt-repository --yes https://adoptopenjdk.jfrog.io/adoptopenjdk/deb/
+          apt-get update
+          apt-get install -y --no-install-recommends adoptopenjdk-8-hotspot
+          pip install wheel requests==2.23.0
+
+        # pip install --no-binary=cryptography cryptography
 
         # Not required, but speeds up builds by storing container images in
         # a GitHub package registry.
@@ -112,8 +124,31 @@ jobs:
 
         run: |
           pip install --prefer-binary -r requirements.txt
+          briefcase create android || true
+          yes | /root/.briefcase/tools/android_sdk/tools/bin/sdkmanager --licenses
           briefcase create android
-          briefcase build android
+
+    - name: Install briefcase
+      run: pip install --prefer-binary -r requirements.txt
+
+    - name: Install NDK and cmake
+      run: |
+        sdkmanager --uninstall "cmake;3.18.1"
+        sdkmanager --install "cmake;3.10.2.4988404" "ndk-bundle"
+
+    - name: Cleanup
+      run: |
+        sudo chown -R $USER:$USER android/
+        find . -type d -name "test" -o -name "tests" -o -iname "*.gz" -exec rm -r {} +
+
+    - name: Build APKs
+      run: briefcase build android
+
+    - uses: actions/upload-artifact@v2
+      with:
+        name: OctoBot-debug.apk
+        path: android/gradle/OctoBot/app/build/outputs/apk/debug/app-debug.apk
+        if-no-files-found: error
 
 #  build-ios:
 #    name: Build IOS
