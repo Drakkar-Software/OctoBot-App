@@ -109,14 +109,12 @@ jobs:
         # no secrets are present in the container state or logs.
         install: |
           apt-get update
-          apt-get install -y --no-install-recommends software-properties-common wget gnupg2 python3.8 python3.8-dev python3-pip python3-cryptography git libssl-dev cargo libffi-dev libgirepository1.0-dev libcairo2-dev libpango1.0-dev libwebkit2gtk-4.0-37 gir1.2-webkit2-4.0
+          apt-get install -y --no-install-recommends software-properties-common wget gnupg2 python3.8 python3.8-dev python3-pip git libssl-dev cargo libffi-dev libgirepository1.0-dev libcairo2-dev libpango1.0-dev libwebkit2gtk-4.0-37 gir1.2-webkit2-4.0
           wget -qO - https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public | apt-key add -
           add-apt-repository --yes https://adoptopenjdk.jfrog.io/adoptopenjdk/deb/
           apt-get update
           apt-get install -y --no-install-recommends adoptopenjdk-8-hotspot
           pip install wheel requests==2.23.0
-
-        # pip install --no-binary=cryptography cryptography
 
         # Not required, but speeds up builds by storing container images in
         # a GitHub package registry.
@@ -139,7 +137,8 @@ jobs:
     - name: Cleanup
       run: |
         sudo chown -R $USER:$USER android/
-        find . -type d -name "test" -o -name "tests" -o -iname "*.gz" -exec rm -r {} +
+        find . -type f -iname "*.gz" -exec rm {} +
+        find . -type d -name "test" -o -name "tests" -exec rm -r {} +
 
     - name: Build APKs
       run: briefcase build android
