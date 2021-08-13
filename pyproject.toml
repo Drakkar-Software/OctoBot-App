@@ -12,7 +12,7 @@ formal_name = "OctoBot"
 description = "Cryptocurrency trading bot"
 icon = "src/octobot_app/resources/octobot"
 sources = ['src/octobot_app']
-requires = ['OctoBot==0.4.0b12', 'git+https://github.com/Herklos/cryptography.git']
+requires = ['OctoBot==0.4.0b12']
 
 [tool.briefcase.app.octobot_app.macOS]
 requires = [
@@ -44,6 +44,5 @@ requires = [
 
 [tool.briefcase.app.octobot_app.android]
 requires = [
-    'toga-android>=0.3.0.dev28',
-    'git+https://github.com/Herklos/cryptography.git'
+    'toga-android>=0.3.0.dev28'
 ]

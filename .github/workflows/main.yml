@@ -114,7 +114,7 @@ jobs:
           add-apt-repository --yes https://adoptopenjdk.jfrog.io/adoptopenjdk/deb/
           apt-get update
           apt-get install -y --no-install-recommends adoptopenjdk-8-hotspot
-          pip install wheel requests==2.23.0
+          pip install --prefer-binary wheel requests==2.23.0
 
         # Not required, but speeds up builds by storing container images in
         # a GitHub package registry.
