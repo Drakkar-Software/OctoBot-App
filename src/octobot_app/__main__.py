@@ -1,19 +1,4 @@
-import _ctypes
 import time
-
-
-def fix_lipthread():
-    print("fix_lipthread")
-    origin_dlopen = _ctypes.dlopen
-
-    def new_dlopen(name, flag, *args, **kwargs):
-        print("new_dlopen")
-        if name == "libpthread.so.0":
-            print("libpthread.so.0")
-            return
-        return origin_dlopen(name, flag, *args, **kwargs)
-
-    _ctypes.dlopen = new_dlopen
 
 
 def main():
@@ -32,5 +17,4 @@ def main():
 
 
 if __name__ == '__main__':
-    fix_lipthread()
     main()
