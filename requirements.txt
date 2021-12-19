@@ -1,1 +1,1 @@
-briefcase==0.3.5
+git+https://github.com/beeware/briefcase.git
